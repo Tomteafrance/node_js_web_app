@@ -1,0 +1,30 @@
+node {
+    checkout scm
+    docker.withregistry('https://registry.hub.docker.com','dockerHub')
+    def customImage = docker.build('ttea/node_js_web_app')
+    customImage.push()
+}
+
+pipeline {
+    agent any
+
+stages {
+    stage('Cloning') {
+        steps {
+                bat  'cd ./node_js_web_app && git pull'
+            }
+        }
+    
+    stage('docker build') {
+            steps {
+                bat 'docker build -t ttea/node_js_web_app .'
+            }
+        }
+
+    stage('docker run') {
+            steps {
+                bat 'docker run -p 3000:3000 -d node_js_web_app'
+            }
+        }
+    }
+}
